@@ -1,0 +1,119 @@
+{% extends "base.html.twig" %}
+{% block title %}
+	Pannel Admin
+{% endblock %}
+
+{% block content %}
+	<h1>Liste des utilisateurs</h1>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Pseudo</th>
+				<th>Email</th>
+				<th>Utilisateur</th>
+				<th>Roles</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in users %}
+				<tr>
+					<td>{{ user.id }}</td>
+					<td>{{ user.pseudo }}</td>
+					<td>{{ user.email }}</td>
+					<td>{{ user.firstName }}
+						{{ user.lastName }}</td>
+					<td>{{ user.roles|join(', ') }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<div class="d-flex justify-content-center mb-4">
+		<a href="{{ path('product_new') }}" class="btn btn-primary btn-lg">Ajouter un nouveau produit</a>
+	</div>
+
+	<h1>Liste des produits</h1>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Nom</th>
+				<th>Description</th>
+				<th>Prix</th>
+				<th>Statut</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for product in products %}
+				<tr>
+					<td>{{ product.id }}</td>
+					<td>{{ product.name }}</td>
+					<td>{{ product.description }}</td>
+					<td>{{ product.price }}
+						€</td>
+					<td>
+						<span class="badge
+								                            {% if product.status.value == 'disponible' %}bg-success{% endif %}
+								                            {% if product.status.value == 'en_rupture' %}bg-danger{% endif %}
+								                            {% if product.status.value == 'en_precommande' %}bg-warning{% endif %}
+								                        ">
+							{{ product.status.value }}
+						</span>
+					</td>
+					<td>
+						<a href="{{ path('product_edit', {id: product.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+						<form action="{{ path('product_delete', {id: product.id}) }}" method="post" style="display:inline;">
+							<input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
+							<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')">
+								Supprimer
+							</button>
+						</form>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<h1>Liste des commandes</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Référence</th>
+                <th>Utilisateur</th>
+                <th>Date de création</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.reference }}</td>
+                    <td>
+                        {{ order.utilisateur.firstName }} {{ order.utilisateur.lastName }}<br>
+                        <small>{{ order.utilisateur.email }}</small>
+                    </td>
+                    <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <span class="badge
+									{% if order.status.value == 'en_preparation' %}bg-warning{% endif %}
+                                    {% if order.status.value == 'expediee' %}bg-warning{% endif %}
+                                    {% if order.status.value == 'livree' %}bg-success{% endif %}
+                                    {% if order.status.value == 'annulee' %}bg-danger{% endif %}
+                                ">
+                            {{ order.status.value }}
+                        </span>
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
